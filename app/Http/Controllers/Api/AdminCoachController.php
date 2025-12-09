@@ -13,7 +13,18 @@ class AdminCoachController extends Controller
     // GET /api/admin/coaches
     public function index()
     {
-        $coaches = SwimCoach::with('user')->orderBy('id', 'desc')->get();
+        $coaches = SwimCoach::with('user')
+            ->orderBy('id', 'desc')
+            ->get()
+            ->map(function ($c) {
+                return [
+                    'id'           => $c->id,
+                    'full_name'    => $c->full_name,
+                    'email'        => $c->user?->email,
+                    'phone_number' => $c->phone_number,
+                    'is_active'    => (bool) $c->is_active,
+                ];
+            });
 
         return response()->json($coaches);
     }
@@ -23,23 +34,26 @@ class AdminCoachController extends Controller
     {
         $coach->load('user');
 
-        return response()->json($coach);
+        return response()->json([
+            'id'           => $coach->id,
+            'full_name'    => $coach->full_name,
+            'email'        => $coach->user?->email,
+            'phone_number' => $coach->phone_number,
+            'is_active'    => (bool) $coach->is_active,
+        ]);
     }
 
     // POST /api/admin/coaches
     public function store(Request $request)
     {
         $data = $request->validate([
-            // akun login coach (kalau coach punya login)
             'name'         => 'required|string|max:255',
             'email'        => 'required|email|unique:users,email',
             'password'     => 'required|string|min:6',
-            // profil coach
             'phone_number' => 'nullable|string|max:20',
             'is_active'    => 'nullable|boolean',
         ]);
 
-        // 1) buat user role coach
         $user = User::create([
             'name'     => $data['name'],
             'email'    => $data['email'],
@@ -47,9 +61,8 @@ class AdminCoachController extends Controller
             'role'     => 'coach',
         ]);
 
-        // 2) buat swim_coach
         $coach = SwimCoach::create([
-            'user_id'      => $user->id ?? null, // kalau kolom user_id sudah ada
+            'user_id'      => $user->id,
             'full_name'    => $data['name'],
             'phone_number' => $data['phone_number'] ?? null,
             'is_active'    => $data['is_active'] ?? true,
@@ -77,7 +90,6 @@ class AdminCoachController extends Controller
             'is_active'    => 'sometimes|boolean',
         ]);
 
-        // update user
         if ($user) {
             if (isset($data['name'])) {
                 $user->name = $data['name'];
@@ -91,7 +103,6 @@ class AdminCoachController extends Controller
             $user->save();
         }
 
-        // update coach profile
         if (isset($data['name'])) {
             $coach->full_name = $data['name'];
         }
@@ -101,7 +112,6 @@ class AdminCoachController extends Controller
         if (array_key_exists('is_active', $data)) {
             $coach->is_active = $data['is_active'];
         }
-
         $coach->save();
 
         $coach->load('user');
@@ -116,9 +126,9 @@ class AdminCoachController extends Controller
 
         if ($coach->user) {
             $coach->user->delete();
-        } else {
-            $coach->delete();
         }
+
+        $coach->delete();
 
         return response()->json([
             'message' => 'Coach deleted',

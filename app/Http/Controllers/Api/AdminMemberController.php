@@ -13,7 +13,19 @@ class AdminMemberController extends Controller
     // GET /api/admin/members
     public function index()
     {
-        $members = SwimMember::with('user')->orderBy('id', 'desc')->get();
+        $members = SwimMember::with('user')
+            ->orderBy('id', 'desc')
+            ->get()
+            ->map(function ($m) {
+                return [
+                    'id'            => $m->id,
+                    'full_name'     => $m->full_name,
+                    'email'         => $m->user?->email,
+                    'phone_number'  => $m->phone_number,
+                    'date_of_birth' => $m->date_of_birth,
+                    'is_active'     => (bool) $m->is_active,
+                ];
+            });
 
         return response()->json($members);
     }
@@ -23,9 +35,15 @@ class AdminMemberController extends Controller
     {
         $member->load('user');
 
-        return response()->json($member);
+        return response()->json([
+            'id'            => $member->id,
+            'full_name'     => $member->full_name,
+            'email'         => $member->user?->email,
+            'phone_number'  => $member->phone_number,
+            'date_of_birth' => $member->date_of_birth,
+            'is_active'     => (bool) $member->is_active,
+        ]);
     }
-
     // POST /api/admin/members
     public function store(Request $request)
     {
