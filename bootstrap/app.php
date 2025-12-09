@@ -13,8 +13,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Daftar alias middleware di sini
+        $middleware->alias([
+            // middleware auth bawaan Laravel (pakai guard, misal auth:sanctum)
+            'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
+
+            // middleware admin buatanmu
+            'admin' => \App\Http\Middleware\AdminOnly::class,
+        ]);
     })
+
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();

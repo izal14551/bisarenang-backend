@@ -4,18 +4,13 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class AdminOnly
 {
-    /**
-     * Handle an incoming request.
-     */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next)
     {
         $user = $request->user();
 
-        // Kalau belum login atau bukan admin
         if (! $user || $user->role !== 'admin') {
             return response()->json([
                 'message' => 'Forbidden: admin only',
