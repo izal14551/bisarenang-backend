@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             ClassSessionInstanceSeeder::class,
             MemberSessionRecordSeeder::class,
             CoachAttendanceLogSeeder::class,
+            AdminUserSeeder::class,
+
         ]);
     }
 }

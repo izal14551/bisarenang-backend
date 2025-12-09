@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\SwimClass;
 use Illuminate\Http\Request;
+use App\Http\Resources\SwimClassResource;
+
 
 class SwimClassController extends Controller
 {
@@ -19,7 +21,7 @@ class SwimClassController extends Controller
 
         $classes = $query->get();
 
-        return response()->json($classes);
+        return SwimClassResource::collection($classes);
     }
 
     public function show($id)
@@ -28,6 +30,6 @@ class SwimClassController extends Controller
             ->where('is_active', true)
             ->findOrFail($id);
 
-        return response()->json($class);
+        return new SwimClassResource($class);
     }
 }

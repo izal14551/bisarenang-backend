@@ -8,11 +8,35 @@ use App\Models\MemberCourseEnrollment;
 use App\Models\SwimClass;
 use App\Models\SwimMember;
 use Illuminate\Http\Request;
+use App\Http\Resources\MemberCourseEnrollmentResource;
+
 
 class EnrollmentController extends Controller
 {
+    public function myEnrollments(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->role !== 'member') {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $member = $user->member;
+
+        if (! $member) {
+            return response()->json(['message' => 'Member profile not found'], 404);
+        }
+
+        $enrollments = MemberCourseEnrollment::with(['swimClass', 'schedule'])
+            ->where('member_id', $member->id)
+            ->where('status', 'active')
+            ->get();
+
+        return MemberCourseEnrollmentResource::collection($enrollments);
+    }
+
     // GET /members/{member}/enrollments
-    public function memberEnrollments($memberId)
+    /* public function memberEnrollments($memberId)
     {
         $member = SwimMember::findOrFail($memberId);
 
@@ -21,8 +45,9 @@ class EnrollmentController extends Controller
             ->where('status', 'active')
             ->get();
 
-        return response()->json($enrollments);
+        return MemberCourseEnrollmentResource::collection($enrollments);
     }
+    */
 
     // POST /enrollments
     // body: member_id, class_id, schedule_id
@@ -75,6 +100,10 @@ class EnrollmentController extends Controller
             'cancellation_date' => null,
         ]);
 
-        return response()->json($enrollment, 201);
+        $enrollment->load(['swimClass', 'schedule']);
+
+        return (new MemberCourseEnrollmentResource($enrollment))
+            ->response()
+            ->setStatusCode(201);
     }
 }

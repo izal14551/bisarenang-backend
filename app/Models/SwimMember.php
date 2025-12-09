@@ -11,11 +11,17 @@ class SwimMember extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'user_id',
         'full_name',
         'phone_number',
         'date_of_birth',
         'is_active',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function enrollments()
     {

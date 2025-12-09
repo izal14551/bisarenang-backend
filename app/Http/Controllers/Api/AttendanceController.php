@@ -18,12 +18,19 @@ class AttendanceController extends Controller
     // body: member_id
     public function memberCheckIn($sessionId, Request $request)
     {
-        $data = $request->validate([
-            'member_id' => 'required|exists:swim_members,id',
-        ]);
+        $user = $request->user();
+
+        if ($user->role !== 'member') {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $member = $user->member;
+
+        if (! $member) {
+            return response()->json(['message' => 'Member profile not found'], 404);
+        }
 
         $session = ClassSessionInstance::findOrFail($sessionId);
-        $member  = SwimMember::findOrFail($data['member_id']);
 
         // cari enrollment member terkait schedule session ini
         $enrollment = MemberCourseEnrollment::where('member_id', $member->id)
@@ -31,7 +38,7 @@ class AttendanceController extends Controller
             ->where('status', 'active')
             ->first();
 
-        if (!$enrollment) {
+        if (! $enrollment) {
             return response()->json([
                 'message' => 'Member is not enrolled for this session schedule',
             ], 404);
@@ -52,7 +59,6 @@ class AttendanceController extends Controller
             $record->status = 'attended';
             $record->save();
 
-            // update cache attendance count
             $session->actual_attendance_count = MemberSessionRecord::where('session_id', $session->id)
                 ->where('status', 'attended')
                 ->count();
@@ -65,6 +71,7 @@ class AttendanceController extends Controller
             ]);
         });
     }
+
 
     // POST /sessions/{session}/coach-check-in
     // body: coach_id
