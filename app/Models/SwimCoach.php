@@ -11,6 +11,7 @@ class SwimCoach extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'user_id',
         'full_name',
         'phone_number',
         'is_active',
