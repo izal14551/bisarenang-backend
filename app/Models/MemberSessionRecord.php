@@ -10,6 +10,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class MemberSessionRecord extends Model
 {
     use HasFactory, SoftDeletes;
+
+    const STATUS_ATTENDED = 'attended';
+    const STATUS_ABSENT   = 'absent';
+    const STATUS_EXPECTED = 'expected';
+
     protected $fillable = [
         'session_id',
         'enrollment_id',

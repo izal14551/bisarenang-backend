@@ -8,6 +8,7 @@ use App\Models\ClassSessionInstance;
 use App\Models\CoachScheduleAssignment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Services\SessionGeneratorService;
 
 class AdminSessionController extends Controller
 {
@@ -41,66 +42,18 @@ class AdminSessionController extends Controller
 
     // POST /api/admin/sessions/generate
     // Generate sesi otomatis untuk bulan tertentu
-    public function generate(Request $request)
+    public function generate(Request $request, SessionGeneratorService $service)
     {
         $request->validate([
             'month' => 'required|integer|min:1|max:12',
             'year'  => 'required|integer|min:2024',
         ]);
 
-        $month = $request->month;
-        $year  = $request->year;
-
-        // 1. Ambil semua jadwal aktif
-        $schedules = ClassSchedule::where('is_active', true)->get();
-        $count = 0;
-
-        foreach ($schedules as $sch) {
-            // 2. Cari tanggal-tanggal di bulan tersebut yang sesuai harinya
-            // Carbon 0 = Minggu, 6 = Sabtu. Tapi di backend kita simpan integer sesuai input (misal 1=Senin)
-
-            $startDate = Carbon::create($year, $month, 1);
-            $endDate   = $startDate->copy()->endOfMonth();
-
-            for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
-                // dayOfWeekIso: 1 (Senin) - 7 (Minggu)
-                // dayOfWeek: 0 (Minggu) - 6 (Sabtu)
-                // Sesuaikan dengan data di database. 
-                // Asumsi di DB: 1=Senin ... 7=Minggu (ISO) atau 1=Senin ... 0=Minggu
-
-                // Cek kesesuaian hari
-                // Misal DB pakai: 1=Senin, 2=Selasa, ..., 7=Minggu
-                if ($date->dayOfWeekIso == $sch->day_of_week) {
-
-                    // 3. Cari Coach Utama untuk jadwal ini
-                    $primaryAssignment = CoachScheduleAssignment::where('schedule_id', $sch->id)
-                        ->where('is_primary', true)
-                        ->first();
-
-                    // 4. Buat Sesi jika belum ada
-                    $session = ClassSessionInstance::firstOrCreate(
-                        [
-                            'schedule_id'  => $sch->id,
-                            'session_date' => $date->format('Y-m-d'),
-                        ],
-                        [
-                            'primary_coach_id' => $primaryAssignment?->coach_id,
-                            'start_time'       => $sch->start_time,
-                            'end_time'         => $sch->end_time,
-                            'session_status'   => 'scheduled',
-                        ]
-                    );
-
-                    if ($session->wasRecentlyCreated) {
-                        $count++;
-                    }
-                }
-            }
-        }
+        $count = $service->generateForMonth($request->month, $request->year);
 
         return response()->json([
-            'message' => "Berhasil generate $count sesi baru untuk bulan $month/$year",
-            'generated_count' => $count
+            'message' => "Berhasil generate $count sesi.",
+            'data'    => ['count' => $count]
         ]);
     }
 }

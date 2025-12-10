@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class AdminOnly
 {
@@ -11,7 +12,7 @@ class AdminOnly
     {
         $user = $request->user();
 
-        if (! $user || $user->role !== 'admin') {
+        if (! $user || $user->role !== User::ROLE_ADMIN) {
             return response()->json([
                 'message' => 'Forbidden: admin only',
             ], 403);

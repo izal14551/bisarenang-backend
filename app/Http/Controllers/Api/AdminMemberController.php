@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\SwimMember;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class AdminMemberController extends Controller
 {
@@ -58,29 +59,27 @@ class AdminMemberController extends Controller
             'is_active'      => 'nullable|boolean',
         ]);
 
-        // 1) buat user role member
-        $user = User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'password' => Hash::make($data['password']),
-            'role'     => 'member',
-        ]);
+        $result = DB::transaction(function () use ($data) {
+            $user = User::create([
+                'name'     => $data['name'],
+                'email'    => $data['email'],
+                'password' => Hash::make($data['password']),
+                'role'     => 'member',
+            ]);
 
-        // 2) buat swim_member terkait user
-        $member = SwimMember::create([
-            'user_id'      => $user->id,
-            'full_name'    => $data['name'],
-            'phone_number' => $data['phone_number'] ?? null,
-            'date_of_birth' => $data['date_of_birth'] ?? null,
-            'is_active'    => $data['is_active'] ?? true,
-        ]);
+            // 2) buat swim_member terkait user
+            $member = SwimMember::create([
+                'user_id'      => $user->id,
+                'full_name'    => $data['name'],
+                'phone_number' => $data['phone_number'] ?? null,
+                'date_of_birth' => $data['date_of_birth'] ?? null,
+                'is_active'    => $data['is_active'] ?? true,
+            ]);
 
-        $member->load('user');
+            return compact('user', 'member');
+        });
 
-        return response()->json([
-            'user'   => $user,
-            'member' => $member,
-        ], 201);
+        return response()->json($result, 201);
     }
 
     // PUT /api/admin/members/{member}

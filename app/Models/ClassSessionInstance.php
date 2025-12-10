@@ -10,6 +10,10 @@ class ClassSessionInstance extends Model
 {
     use HasFactory, SoftDeletes;
 
+    const STATUS_SCHEDULED = 'scheduled';
+    const STATUS_COMPLETED = 'completed';
+    const STATUS_CANCELLED = 'cancelled';
+
     protected $fillable = [
         'schedule_id',
         'primary_coach_id',

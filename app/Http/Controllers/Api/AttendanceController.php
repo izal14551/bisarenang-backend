@@ -56,7 +56,7 @@ class AttendanceController extends Controller
             );
 
             $record->check_in_time = now();
-            $record->status = 'attended';
+            $record->status = MemberSessionRecord::STATUS_ATTENDED;
             $record->save();
 
             $session->actual_attendance_count = MemberSessionRecord::where('session_id', $session->id)
