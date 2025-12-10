@@ -16,14 +16,15 @@ class SwimClassResource extends JsonResource
             'max_capacity'  => $this->max_capacity,
 
             'pool' => [
-                'id'   => $this->pool->id ?? null,
-                'name' => $this->pool->pool_name ?? null,
+                'id'   => $this->pool?->id,
+                'name' => $this->pool?->pool_name,
             ],
 
             'schedules' => $this->whenLoaded('schedules', function () {
                 return $this->schedules->map(function ($schedule) {
                     return [
                         'id'          => $schedule->id,
+                        'class_id'    => $schedule->class_id,
                         'day_of_week' => $schedule->day_of_week,
                         'start_time'  => $schedule->start_time,
                         'end_time'    => $schedule->end_time,

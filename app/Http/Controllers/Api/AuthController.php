@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Models\SwimMember;
+use App\Models\SwimCoach;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -56,27 +58,30 @@ class AuthController extends Controller
     // POST /api/login
     public function login(Request $request)
     {
-        $data = $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required|string',
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
         ]);
 
-        $user = User::where('email', $data['email'])->first();
-
-        if (! $user || ! Hash::check($data['password'], $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
+        if (!Auth::attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        // Optional: revoke tokens lama
-        $user->tokens()->delete();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $token = $user->createToken('auth_token')->plainTextToken;
+        // TAMBAHAN: Cari data member berdasarkan user_id
+        $member = SwimMember::where('user_id', $user->id)->first();
 
-        $token = $user->createToken('api_token')->plainTextToken;
+        // Opsional: Cari data coach juga jika user ini coach
+        $coach = SwimCoach::where('user_id', $user->id)->first();
 
         return response()->json([
-            'user'  => $user,
+            'message' => 'Login successful',
             'token' => $token,
+            'user' => $user,
+            'member' => $member,
+            'coach' => $coach,
         ]);
     }
 

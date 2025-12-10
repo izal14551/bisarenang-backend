@@ -9,6 +9,12 @@ use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AdminMemberController;
 use App\Http\Controllers\Api\AdminCoachController;
+use App\Http\Controllers\Api\AdminPoolController;
+use App\Http\Controllers\Api\AdminSwimClassController;
+use App\Http\Controllers\Api\AdminScheduleController;
+use App\Http\Controllers\Api\AdminEnrollmentController;
+use App\Http\Controllers\Api\AdminCoachAssignmentController;
+use App\Http\Controllers\Api\AdminSessionController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -52,4 +58,35 @@ Route::middleware(['auth:sanctum', 'admin'])
         Route::get('/coaches/{coach}', [AdminCoachController::class, 'show']);
         Route::put('/coaches/{coach}', [AdminCoachController::class, 'update']);
         Route::delete('/coaches/{coach}', [AdminCoachController::class, 'destroy']);
+
+        // Pool management
+        Route::get('/pools', [AdminPoolController::class, 'index']);
+        Route::post('/pools', [AdminPoolController::class, 'store']);
+        Route::get('/pools/{pool}', [AdminPoolController::class, 'show']);
+        Route::put('/pools/{pool}', [AdminPoolController::class, 'update']);
+        Route::delete('/pools/{pool}', [AdminPoolController::class, 'destroy']);
+
+        // Swim Class management
+        Route::get('/classes', [AdminSwimClassController::class, 'index']);
+        Route::post('/classes', [AdminSwimClassController::class, 'store']);
+        Route::put('/classes/{swimClass}', [AdminSwimClassController::class, 'update']);
+        Route::delete('/classes/{swimClass}', [AdminSwimClassController::class, 'destroy']);
+
+        // Schedule Management
+        Route::get('/classes/{classId}/schedules', [AdminScheduleController::class, 'index']);
+        Route::post('/schedules', [AdminScheduleController::class, 'store']);
+        Route::delete('/schedules/{schedule}', [AdminScheduleController::class, 'destroy']);
+
+        // Enrollment Management
+        Route::get('/classes/{classId}/enrollments', [AdminEnrollmentController::class, 'index']);
+        Route::post('/enrollments', [AdminEnrollmentController::class, 'store']);
+        Route::delete('/enrollments/{id}', [AdminEnrollmentController::class, 'destroy']);
+
+        // Coach Assignment
+        Route::post('/coach-assignments', [AdminCoachAssignmentController::class, 'store']);
+        Route::delete('/coach-assignments/{id}', [AdminCoachAssignmentController::class, 'destroy']);
+
+        // Session Management
+        Route::get('/sessions', [AdminSessionController::class, 'index']);
+        Route::post('/sessions/generate', [AdminSessionController::class, 'generate']);
     });

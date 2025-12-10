@@ -5,8 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use app\Models\SwimClass;
-use app\Models\MemberCourseEnrollment;
+
 
 
 class ClassSchedule extends Model
@@ -19,6 +18,11 @@ class ClassSchedule extends Model
         'start_time',
         'end_time',
         'is_active',
+    ];
+
+    protected $casts = [
+        'day_of_week' => 'integer',
+        'is_active'   => 'boolean',
     ];
 
     public function swimClass()
