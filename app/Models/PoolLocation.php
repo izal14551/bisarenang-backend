@@ -22,7 +22,7 @@ class PoolLocation extends Model
     public function coaches()
     {
         return $this->belongsToMany(SwimCoach::class, 'coach_pool_assignments', 'pool_id', 'coach_id')
-            ->withPivot('effective_from', 'effective_until', 'is_primary')
+            ->withPivot(['id', 'is_primary', 'effective_from', 'effective_until'])
             ->withTimestamps();
     }
 

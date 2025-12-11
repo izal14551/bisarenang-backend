@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\AdminScheduleController;
 use App\Http\Controllers\Api\AdminEnrollmentController;
 use App\Http\Controllers\Api\AdminCoachAssignmentController;
 use App\Http\Controllers\Api\AdminSessionController;
+use App\Http\Controllers\Api\AdminCoachPoolController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -89,4 +90,9 @@ Route::middleware(['auth:sanctum', 'admin'])
         // Session Management
         Route::get('/sessions', [AdminSessionController::class, 'index']);
         Route::post('/sessions/generate', [AdminSessionController::class, 'generate']);
+
+        // Coach Pool Assignment 
+        Route::get('/coaches/{coachId}/pools', [AdminCoachPoolController::class, 'index']);
+        Route::post('/coach-pools', [AdminCoachPoolController::class, 'store']);
+        Route::delete('/coach-pools/{id}', [AdminCoachPoolController::class, 'destroy']);
     });
