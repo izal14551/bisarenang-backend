@@ -23,7 +23,7 @@ class StorePoolRequest extends FormRequest
     {
         return [
             'pool_name' => ['required', 'string', 'max:255'],
-            'is_active' => ['required', 'boolean'],
+            'is_available' => ['required', 'boolean'],
         ];
     }
 }

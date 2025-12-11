@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\StoreAdminEnrollmentRequest;
+use App\Http\Requests\StoreAdminEnrollmentRequest;
 use App\Models\MemberCourseEnrollment;
 use App\Models\SwimClass;
 use App\Models\SwimMember;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Admin;
+namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -8,7 +8,6 @@ class StoreAdminEnrollmentRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // bisa di-tighten: return $this->user()?->role === User::ROLE_ADMIN;
         return true;
     }
 

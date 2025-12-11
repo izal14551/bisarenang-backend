@@ -19,7 +19,7 @@ class UpdatePoolRequest extends FormRequest
     {
         return [
             'pool_name' => ['sometimes', 'string', 'max:255'],
-            'is_active' => ['sometimes', 'boolean'],
+            'is_available' => ['sometimes', 'boolean'],
         ];
     }
 }

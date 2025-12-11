@@ -67,7 +67,7 @@ class AdminMemberController extends Controller
                 'role'     => User::ROLE_MEMBER,
             ]);
 
-            // 2) buat swim_member terkait user
+            // buat swim_member terkait user
             $member = SwimMember::create([
                 'user_id'      => $user->id,
                 'full_name'    => $data['name'],
@@ -137,11 +137,10 @@ class AdminMemberController extends Controller
     {
         $member->load('user');
 
-        // kalau mau hard delete user juga:
         if ($member->user) {
-            $member->user->delete(); // jika user ga pakai softDeletes, ini hard delete
+            $member->user->delete();
         } else {
-            $member->delete(); // soft delete member saja
+            $member->delete();
         }
 
         return response()->json([

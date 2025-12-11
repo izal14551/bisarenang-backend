@@ -10,7 +10,7 @@ class StoreEnrollmentRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->role === User::ROLE_ADMIN;
+        return true;
     }
 
     public function rules(): array

@@ -11,7 +11,6 @@ class AdminSwimClassController extends Controller
     // GET /api/admin/classes
     public function index()
     {
-        // Load relasi pool agar bisa menampilkan nama kolam di list
         $classes = SwimClass::with('pool')
             ->orderBy('id', 'desc')
             ->get();
@@ -26,7 +25,7 @@ class AdminSwimClassController extends Controller
             'pool_id'       => 'required|exists:pool_locations,id',
             'name'          => 'required|string|max:255',
             'description'   => 'nullable|string',
-            'schedule_type' => 'required|string', // Misal: Regular, Private, dll
+            'schedule_type' => 'required|string',
             'max_capacity'  => 'required|integer|min:1',
             'is_active'     => 'boolean',
         ]);

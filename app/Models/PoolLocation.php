@@ -15,6 +15,10 @@ class PoolLocation extends Model
         'is_available',
     ];
 
+    protected $casts = [
+        'is_available' => 'boolean',
+    ];
+
     public function coaches()
     {
         return $this->belongsToMany(SwimCoach::class, 'coach_pool_assignments', 'pool_id', 'coach_id')
