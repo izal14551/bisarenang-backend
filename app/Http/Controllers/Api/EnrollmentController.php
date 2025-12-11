@@ -9,6 +9,8 @@ use App\Models\SwimClass;
 use App\Models\SwimMember;
 use Illuminate\Http\Request;
 use App\Http\Resources\MemberCourseEnrollmentResource;
+use App\Http\Requests\StoreEnrollmentRequest;
+use App\Models\User;
 
 
 class EnrollmentController extends Controller
@@ -17,7 +19,7 @@ class EnrollmentController extends Controller
     {
         $user = $request->user();
 
-        if ($user->role !== 'member') {
+        if ($user->role !== User::ROLE_MEMBER) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
@@ -35,29 +37,10 @@ class EnrollmentController extends Controller
         return MemberCourseEnrollmentResource::collection($enrollments);
     }
 
-    // GET /members/{member}/enrollments
-    /* public function memberEnrollments($memberId)
-    {
-        $member = SwimMember::findOrFail($memberId);
-
-        $enrollments = MemberCourseEnrollment::with(['swimClass', 'schedule'])
-            ->where('member_id', $member->id)
-            ->where('status', 'active')
-            ->get();
-
-        return MemberCourseEnrollmentResource::collection($enrollments);
-    }
-    */
-
     // POST /enrollments
-    // body: member_id, class_id, schedule_id
-    public function store(Request $request)
+    public function store(StoreEnrollmentRequest  $request)
     {
-        $data = $request->validate([
-            'member_id'   => 'required|exists:swim_members,id',
-            'class_id'    => 'required|exists:swim_classes,id',
-            'schedule_id' => 'nullable|exists:class_schedules,id',
-        ]);
+        $data = $request->validated();
 
         $member = SwimMember::findOrFail($data['member_id']);
         $class  = SwimClass::findOrFail($data['class_id']);

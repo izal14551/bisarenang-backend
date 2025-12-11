@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\GeneratorSessionRequest;
 use App\Models\ClassSchedule;
 use App\Models\ClassSessionInstance;
 use App\Models\CoachScheduleAssignment;
@@ -32,7 +33,7 @@ class AdminSessionController extends Controller
                     'date'         => $s->session_date,
                     'time'         => substr($s->start_time, 0, 5) . ' - ' . substr($s->end_time, 0, 5),
                     'coach_name'   => $s->primaryCoach->full_name ?? 'Belum ada Coach',
-                    'status'       => $s->session_status, // scheduled, completed, cancelled
+                    'status'       => $s->session_status,
                     'attendance'   => $s->actual_attendance_count,
                 ];
             });
@@ -42,12 +43,9 @@ class AdminSessionController extends Controller
 
     // POST /api/admin/sessions/generate
     // Generate sesi otomatis untuk bulan tertentu
-    public function generate(Request $request, SessionGeneratorService $service)
+    public function generate(GeneratorSessionRequest $request, SessionGeneratorService $service)
     {
-        $request->validate([
-            'month' => 'required|integer|min:1|max:12',
-            'year'  => 'required|integer|min:2024',
-        ]);
+        $request->validated();
 
         $count = $service->generateForMonth($request->month, $request->year);
 

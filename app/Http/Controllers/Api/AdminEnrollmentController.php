@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreAdminEnrollmentRequest;
 use App\Models\MemberCourseEnrollment;
 use App\Models\SwimClass;
 use App\Models\SwimMember;
@@ -37,18 +38,16 @@ class AdminEnrollmentController extends Controller
 
     // POST /api/admin/enrollments
     // Admin mendaftarkan member secara manual
-    public function store(Request $request)
+    public function store(StoreAdminEnrollmentRequest $request)
     {
-        $data = $request->validate([
-            'class_id'    => 'required|exists:swim_classes,id',
-            'member_id'   => 'required|exists:swim_members,id',
-            'schedule_id' => 'nullable|exists:class_schedules,id',
-        ]);
+        $data = $request->validated();
+
+        $scheduleId = $data['schedule_id'];
 
         $existingEnrollment = MemberCourseEnrollment::withTrashed()
             ->where('class_id', $data['class_id'])
             ->where('member_id', $data['member_id'])
-            ->where('schedule_id', $data['schedule_id'])
+            ->where('schedule_id', $scheduleId)
             ->first();
 
         if ($existingEnrollment) {
@@ -59,7 +58,7 @@ class AdminEnrollmentController extends Controller
             $existingEnrollment->restore();
             $existingEnrollment->update([
                 'status' => 'active',
-                'enrollment_date' => now(),
+                'enrollment_date' => now()->toDateString(),
                 'cancellation_date' => null,
             ]);
 
@@ -69,22 +68,21 @@ class AdminEnrollmentController extends Controller
         $enrollment = MemberCourseEnrollment::create([
             'class_id'        => $data['class_id'],
             'member_id'       => $data['member_id'],
-            'schedule_id'     => $data['schedule_id'],
+            'schedule_id'     => $scheduleId,
             'status'          => 'active',
-            'enrollment_date' => now(),
+            'enrollment_date' => now()->toDateString(),
         ]);
 
         return response()->json($enrollment, 201);
     }
 
     // DELETE /api/admin/enrollments/{id}
-    // Admin membatalkan/mengeluarkan member
+    // Admin mengeluarkan member
     public function destroy($id)
     {
         $enrollment = MemberCourseEnrollment::findOrFail($id);
-        // Bisa soft delete atau update status
         $enrollment->update(['status' => 'cancelled', 'cancellation_date' => now()]);
-        $enrollment->delete(); // Soft delete agar history tetap ada
+        $enrollment->delete();
 
         return response()->json(['message' => 'Peserta berhasil dihapus dari kelas']);
     }

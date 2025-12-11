@@ -64,7 +64,7 @@ class AdminMemberController extends Controller
                 'name'     => $data['name'],
                 'email'    => $data['email'],
                 'password' => Hash::make($data['password']),
-                'role'     => 'member',
+                'role'     => User::ROLE_MEMBER,
             ]);
 
             // 2) buat swim_member terkait user

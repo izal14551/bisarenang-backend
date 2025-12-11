@@ -40,26 +40,6 @@ class SessionController extends Controller
         return ClassSessionInstanceResource::collection($sessions);
     }
 
-    // GET /members/{member}/sessions
-    /* public function memberSessions($memberId, Request $request)
-    {
-        $member = SwimMember::findOrFail($memberId);
-
-        $enrollmentIds = MemberCourseEnrollment::where('member_id', $member->id)
-            ->where('status', 'active')
-            ->pluck('id');
-
-        $sessions = ClassSessionInstance::with(['schedule.swimClass', 'primaryCoach', 'memberSessionRecords'])
-            ->whereHas('memberSessionRecords', function ($q) use ($enrollmentIds) {
-                $q->whereIn('enrollment_id', $enrollmentIds);
-            })
-            ->orderBy('session_date')
-            ->get();
-
-        return ClassSessionInstanceResource::collection($sessions);
-    }
-    */
-
     public function coachSessions($coachId, Request $request)
     {
         $coach = SwimCoach::findOrFail($coachId);

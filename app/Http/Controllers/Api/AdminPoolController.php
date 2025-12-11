@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StorePoolRequest;
+use App\Http\Requests\UpdatePoolRequest;
 use App\Models\PoolLocation;
 use Illuminate\Http\Request;
 
@@ -11,18 +13,14 @@ class AdminPoolController extends Controller
     // GET /api/admin/pools
     public function index()
     {
-        // Tampilkan semua kolam (termasuk yang tidak aktif)
         $pools = PoolLocation::orderBy('id', 'desc')->get();
         return response()->json($pools);
     }
 
     // POST /api/admin/pools
-    public function store(Request $request)
+    public function store(StorePoolRequest $request)
     {
-        $data = $request->validate([
-            'pool_name'    => 'required|string|max:255',
-            'is_available' => 'boolean',
-        ]);
+        $data = $request->validated();
 
         $pool = PoolLocation::create([
             'pool_name'    => $data['pool_name'],
@@ -39,12 +37,9 @@ class AdminPoolController extends Controller
     }
 
     // PUT /api/admin/pools/{pool}
-    public function update(Request $request, PoolLocation $pool)
+    public function update(UpdatePoolRequest $request, PoolLocation $pool)
     {
-        $data = $request->validate([
-            'pool_name'    => 'sometimes|string|max:255',
-            'is_available' => 'sometimes|boolean',
-        ]);
+        $data = $request->validated();
 
         $pool->update($data);
 

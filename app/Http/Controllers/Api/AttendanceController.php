@@ -11,16 +11,16 @@ use App\Models\SwimCoach;
 use App\Models\SwimMember;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 class AttendanceController extends Controller
 {
     // POST /sessions/{session}/member-check-in
-    // body: member_id
     public function memberCheckIn($sessionId, Request $request)
     {
         $user = $request->user();
 
-        if ($user->role !== 'member') {
+        if ($user->role !== User::ROLE_MEMBER) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
@@ -32,7 +32,6 @@ class AttendanceController extends Controller
 
         $session = ClassSessionInstance::findOrFail($sessionId);
 
-        // cari enrollment member terkait schedule session ini
         $enrollment = MemberCourseEnrollment::where('member_id', $member->id)
             ->where('schedule_id', $session->schedule_id)
             ->where('status', 'active')
@@ -51,7 +50,7 @@ class AttendanceController extends Controller
                     'enrollment_id' => $enrollment->id,
                 ],
                 [
-                    'status'        => 'expected',
+                    'status'        => MemberSessionRecord::STATUS_EXPECTED,
                 ]
             );
 
@@ -60,7 +59,7 @@ class AttendanceController extends Controller
             $record->save();
 
             $session->actual_attendance_count = MemberSessionRecord::where('session_id', $session->id)
-                ->where('status', 'attended')
+                ->where('status', MemberSessionRecord::STATUS_ATTENDED)
                 ->count();
             $session->save();
 
@@ -74,7 +73,6 @@ class AttendanceController extends Controller
 
 
     // POST /sessions/{session}/coach-check-in
-    // body: coach_id
     public function coachCheckIn($sessionId, Request $request)
     {
         $data = $request->validate([
