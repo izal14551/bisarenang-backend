@@ -20,8 +20,6 @@ class SessionGeneratorService
         foreach ($schedules as $sch) {
             // Loop setiap hari di bulan tersebut
             for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
-                // Sesuaikan logika hari (DB: 1=Senin...7=Minggu atau 0=Minggu)
-                // Asumsi: DB kamu pakai ISO-8601 (1=Senin ... 7=Minggu)
                 if ($date->dayOfWeekIso !== $sch->day_of_week) {
                     continue;
                 }
