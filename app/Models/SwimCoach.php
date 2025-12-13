@@ -17,11 +17,9 @@ class SwimCoach extends Model
         'is_active',
     ];
 
-    public function pools()
+    public function poolAssign()
     {
-        return $this->belongsToMany(PoolLocation::class, 'coach_pool_assignments', 'coach_id', 'pool_id')
-            ->withPivot(['id', 'is_primary', 'effective_from', 'effective_until'])
-            ->withTimestamps();
+        return $this->hasMany(CoachPoolAssignment::class, 'coach_id');
     }
 
 

@@ -21,7 +21,6 @@ class ClassSchedule extends Model
     ];
 
     protected $casts = [
-        'day_of_week' => 'integer',
         'is_active'   => 'boolean',
     ];
 

@@ -12,9 +12,14 @@ class CoachAttendanceLog extends Model
     protected $fillable = [
         'session_id',
         'coach_id',
+        'pool_assign_id',
         'check_in_time',
         'status',
     ];
+    public function poolAssign()
+    {
+        return $this->belongsTo(CoachPoolAssignment::class, 'pool_assign_id');
+    }
     public function session()
     {
         return $this->belongsTo(ClassSessionInstance::class, 'session_id');

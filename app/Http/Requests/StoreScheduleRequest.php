@@ -24,7 +24,7 @@ class StoreScheduleRequest extends FormRequest
     {
         return [
             'class_id'    => 'required|exists:swim_classes,id',
-            'day_of_week' => 'required|integer|min:1|max:7',
+            'day_of_week' => 'required|string|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
             'start_time'  => 'required|date_format:H:i',
             'end_time'    => 'required|date_format:H:i|after:start_time',
         ];

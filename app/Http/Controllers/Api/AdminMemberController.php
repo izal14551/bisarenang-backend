@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class AdminMemberController extends Controller
 {
-    // GET /api/admin/members
+    // GET /api/admin/memberss
     public function index()
     {
         $members = SwimMember::with('user')
