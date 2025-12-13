@@ -14,6 +14,7 @@ class AdminCoachAssignmentController extends Controller
         $data = $request->validate([
             'schedule_id' => 'required|exists:class_schedules,id',
             'coach_id'    => 'required|exists:swim_coaches,id',
+            'pool_assign_id' => 'required|exists:coach_pool_assignments,id',
             'is_primary'  => 'boolean',
         ]);
 
@@ -29,6 +30,7 @@ class AdminCoachAssignmentController extends Controller
         $assignment = CoachScheduleAssignment::create([
             'schedule_id' => $data['schedule_id'],
             'coach_id'    => $data['coach_id'],
+            'pool_assign_id' => $data['pool_assign_id'],
             'is_primary'  => $data['is_primary'] ?? false,
             'effective_from' => now(),
         ]);

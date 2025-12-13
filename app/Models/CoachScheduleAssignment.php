@@ -13,6 +13,7 @@ class CoachScheduleAssignment extends Model
     protected $fillable = [
         'coach_id',
         'schedule_id',
+        'pool_assign_id',
         'is_primary',
         'effective_from',
         'effective_until',
